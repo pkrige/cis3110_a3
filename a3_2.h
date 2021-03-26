@@ -8,10 +8,12 @@ typedef struct process{
 } process;
 
 typedef struct my_queue{
-    int front, end, size;
+    int start, end, size;
 
     process* processes;
 } my_queue;
 
 process* readfile(char* filename);
 my_queue* makeQueue();
+process dequeue(my_queue* queue);
+void enqueue(my_queue *queue, process to_add);

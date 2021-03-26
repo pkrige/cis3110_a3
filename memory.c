@@ -5,7 +5,13 @@ int main(int argc, char* argv[]){
         fprintf(stderr,"INSUFFICIENT ARGUMENTS: Please enter the filename followed by the insertion style. ex. ./holes filename.txt first/next/best/worst\n");
     } else{
         process* to_process = readfile(argv[1]);
-        my_queue *queue = makeQueue();
+        my_queue *queue = makeQueue(to_process);
+
+        process temp = dequeue(queue);
+
+        printf("Popped of the queue: pid: %c %d\n", temp.p_id, temp.req_mem);
+
+        enqueue(queue,temp);
 
         if(strcmp("first", argv[2])== 0){
             printf("first\n");
@@ -36,7 +42,6 @@ process* readfile(char* filename){
     }
 
     while(fscanf(fp,"%c %d\n",&r_char,&r_int) != EOF){
-        
         processes[i].p_id = r_char;
         processes[i].req_mem = r_int;
         i++;
@@ -44,21 +49,21 @@ process* readfile(char* filename){
 
     processes = realloc(processes,i*sizeof(process));
 
-    for(int j = 0; j < i; j++){
+/*     for(int j = 0; j < i; j++){
         printf("Process ID: %c, Required Memory: %d\n",processes[j].p_id,processes[j].req_mem);
-    }
+    } */
 
     return processes;
 }
 
-my_queue* makeQueue(){
+my_queue* makeQueue(process* to_add){
     my_queue *queue = malloc(sizeof(my_queue));
    
-    queue->front = 0;
+    queue->start = 0;
     queue->end = 0;
-    queue->size = 0;
+    queue->size = sizeof(to_add)/sizeof(process);
 
-    queue->processes = malloc(sizeof(process));
+    queue->processes = to_add;
 
     printf("Suxxessfully initialized the queue.\n");
     return queue;
@@ -70,3 +75,17 @@ void enqueue(my_queue *queue, process to_add){
     queue->size += 1;
     printf("Process %c with mem. req. %d has been added.\n",queue->processes[queue->end].p_id, queue->processes[queue->end].req_mem);
 }
+
+process dequeue(my_queue* queue){
+    if(queue->size == 0){
+        printf("Nothign to remove, queue empty.\n");
+    }
+
+    process temp = queue -> processes[queue->start];
+
+    queue->start += 1;
+    queue->size -=1;
+
+    return temp;
+}
+
